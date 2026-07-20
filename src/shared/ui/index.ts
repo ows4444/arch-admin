@@ -1,0 +1,1 @@
+export { Logomark } from './Logomark'

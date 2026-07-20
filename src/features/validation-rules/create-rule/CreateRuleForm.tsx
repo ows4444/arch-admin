@@ -47,71 +47,105 @@ export function CreateRuleForm({ targetType }: { targetType: string }) {
 
   return (
     <form onSubmit={handleSubmit} noValidate>
-      <h3>Add rule for {targetType}</h3>
-      <div>
-        <label htmlFor={fieldId}>Field</label>
-        <input
-          id={fieldId}
-          value={form.field}
-          onChange={(event) => setForm({ ...form, field: event.target.value })}
-        />
+      <h2 className="section-heading">
+        Add rule for <code className="token">{targetType}</code>
+      </h2>
+
+      <div className="field-row">
+        <div className="field">
+          <label className="field-label" htmlFor={fieldId}>
+            Field
+          </label>
+          <input
+            id={fieldId}
+            className="input input--mono"
+            value={form.field}
+            onChange={(event) => setForm({ ...form, field: event.target.value })}
+          />
+        </div>
+        <div className="field">
+          <label className="field-label" htmlFor={operatorId}>
+            Operator
+          </label>
+          <select
+            id={operatorId}
+            className="select"
+            value={form.operator}
+            onChange={(event) =>
+              setForm({ ...form, operator: event.target.value as ValidationRuleOperator })
+            }
+          >
+            {VALIDATION_RULE_OPERATORS.map((operator) => (
+              <option key={operator} value={operator}>
+                {operator}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
-      <div>
-        <label htmlFor={operatorId}>Operator</label>
-        <select
-          id={operatorId}
-          value={form.operator}
-          onChange={(event) =>
-            setForm({ ...form, operator: event.target.value as ValidationRuleOperator })
-          }
-        >
-          {VALIDATION_RULE_OPERATORS.map((operator) => (
-            <option key={operator} value={operator}>
-              {operator}
-            </option>
-          ))}
-        </select>
+
+      <div className="field-row">
+        <div className="field">
+          <label className="field-label" htmlFor={valueId}>
+            Value (JSON)
+          </label>
+          <input
+            id={valueId}
+            className="input input--mono"
+            value={form.valueJson}
+            placeholder='e.g. "root" or ["a","b"]'
+            onChange={(event) => setForm({ ...form, valueJson: event.target.value })}
+          />
+        </div>
+        <div className="field">
+          <label className="field-label" htmlFor={compareFieldId}>
+            Compare field (alternative to value)
+          </label>
+          <input
+            id={compareFieldId}
+            className="input input--mono"
+            value={form.compareField}
+            onChange={(event) => setForm({ ...form, compareField: event.target.value })}
+          />
+        </div>
       </div>
-      <div>
-        <label htmlFor={valueId}>Value (JSON)</label>
-        <input
-          id={valueId}
-          value={form.valueJson}
-          placeholder='e.g. "root" or ["a","b"]'
-          onChange={(event) => setForm({ ...form, valueJson: event.target.value })}
-        />
-      </div>
-      <div>
-        <label htmlFor={compareFieldId}>Compare field (alternative to value)</label>
-        <input
-          id={compareFieldId}
-          value={form.compareField}
-          onChange={(event) => setForm({ ...form, compareField: event.target.value })}
-        />
-      </div>
-      <div>
-        <label htmlFor={messageId}>Message</label>
+
+      <div className="field">
+        <label className="field-label" htmlFor={messageId}>
+          Message
+        </label>
         <input
           id={messageId}
+          className="input"
           value={form.message}
           onChange={(event) => setForm({ ...form, message: event.target.value })}
         />
       </div>
+
+      <label className="checkbox-field">
+        <input
+          type="checkbox"
+          checked={form.enabled}
+          onChange={(event) => setForm({ ...form, enabled: event.target.checked })}
+        />
+        Enabled
+      </label>
+
+      {error && (
+        <p className="status-message status-message--error" role="alert">
+          {error}
+        </p>
+      )}
+      {createRule.isError && (
+        <p className="status-message status-message--error" role="alert">
+          Failed to create rule. Please try again.
+        </p>
+      )}
       <div>
-        <label>
-          <input
-            type="checkbox"
-            checked={form.enabled}
-            onChange={(event) => setForm({ ...form, enabled: event.target.checked })}
-          />
-          Enabled
-        </label>
+        <button type="submit" className="btn btn--primary" disabled={createRule.isPending}>
+          {createRule.isPending ? 'Adding…' : 'Add rule'}
+        </button>
       </div>
-      {error && <p role="alert">{error}</p>}
-      {createRule.isError && <p role="alert">Failed to create rule. Please try again.</p>}
-      <button type="submit" disabled={createRule.isPending}>
-        {createRule.isPending ? 'Adding…' : 'Add rule'}
-      </button>
     </form>
   )
 }

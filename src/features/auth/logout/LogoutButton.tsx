@@ -12,7 +12,7 @@ export function LogoutButton() {
   }
 
   return (
-    <button type="button" onClick={handleLogout} disabled={logout.isPending}>
+    <button type="button" className="btn btn--ghost btn--sm" onClick={handleLogout} disabled={logout.isPending}>
       {logout.isPending ? 'Signing out…' : 'Sign out'}
     </button>
   )

@@ -29,36 +29,50 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit} noValidate>
-      <div>
-        <label htmlFor={emailId}>Email</label>
+      <div className="field">
+        <label className="field-label" htmlFor={emailId}>
+          Email
+        </label>
         <input
           id={emailId}
+          className="input"
           type="email"
           value={email}
           autoComplete="email"
           onChange={(event) => setEmail(event.target.value)}
         />
-        {fieldErrors.email && <p role="alert">{fieldErrors.email}</p>}
+        {fieldErrors.email && (
+          <p className="status-message status-message--error" role="alert">
+            {fieldErrors.email}
+          </p>
+        )}
       </div>
-      <div>
-        <label htmlFor={passwordId}>Password</label>
+      <div className="field">
+        <label className="field-label" htmlFor={passwordId}>
+          Password
+        </label>
         <input
           id={passwordId}
+          className="input"
           type="password"
           value={password}
           autoComplete="current-password"
           onChange={(event) => setPassword(event.target.value)}
         />
-        {fieldErrors.password && <p role="alert">{fieldErrors.password}</p>}
+        {fieldErrors.password && (
+          <p className="status-message status-message--error" role="alert">
+            {fieldErrors.password}
+          </p>
+        )}
       </div>
       {login.isError && (
-        <p role="alert">
+        <p className="status-message status-message--error" role="alert">
           {login.error instanceof ApiError && login.error.status === 401
             ? 'Incorrect email or password.'
             : 'Something went wrong. Please try again.'}
         </p>
       )}
-      <button type="submit" disabled={login.isPending}>
+      <button type="submit" className="btn btn--primary btn--block" disabled={login.isPending}>
         {login.isPending ? 'Signing in…' : 'Sign in'}
       </button>
     </form>
