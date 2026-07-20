@@ -77,3 +77,9 @@ Fetch-on-render (TanStack Query) for all routes. CSR-only, no prerendering — n
   - `features/auth/logout`: `LogoutButton`
   - `shared/api`: `http`, `ApiError`, `HttpRequestOptions`
 - Layer boundaries: `shared/api` has no upstream imports; `entities/session` imports only `shared/api`; `features/auth/*` import `shared/api` and `entities/session`; `pages/*` and `widgets/app-shell` import from `features/*` and `entities/session`; `app/*` composes `pages/*` and `widgets/*`.
+
+## Amendment (found while building `entities/validation-rule`, same date)
+
+The HIGH decision above to proxy each backend path directly (`/auth`, `/validation-rules` → backend) was wrong: it collides with any frontend page route of the same name. Building the `/validation-rules` page surfaced this immediately — a full-page load of that route hit the Vite proxy instead of the SPA, so it never reached React Router. Reverified live: `GET http://localhost:5173/validation-rules` returned the backend's raw `{"message":"Missing bearer token."}` JSON instead of `index.html`.
+
+Fixed by proxying under `/api` instead (stripped before forwarding to the backend), so the proxy prefix can never collide with a page route by construction. `shared/api`'s default base URL changed from `''` to `'/api'` to match. See `entities/validation-rule/ARCH.md` for the full writeup — logged here too since it corrects a decision made in this document.

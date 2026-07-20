@@ -1,8 +1,9 @@
-// Empty by default so requests are same-origin and go through the Vite dev
-// proxy (see vite.config.ts). Production deployments must set VITE_API_URL
-// to the API's origin, which then requires that origin to be CORS-allowed
-// on the backend.
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? ''
+// Defaults to the same-origin /api prefix, proxied to the backend by Vite in
+// dev (see vite.config.ts) — kept under /api specifically so it can never
+// collide with a frontend page route. Production deployments must set
+// VITE_API_URL to the API's actual origin, which then requires that origin
+// to be CORS-allowed on the backend.
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? '/api'
 
 export class ApiError extends Error {
   status: number

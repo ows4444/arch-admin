@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom'
+import { NavLink, Outlet } from 'react-router-dom'
 import { LogoutButton } from '../../features/auth/logout'
 import { useCurrentUser } from '../../entities/session'
 
@@ -12,6 +12,12 @@ export function AppShell() {
       </a>
       <header>
         <span>Arch Admin</span>
+        <nav>
+          <NavLink to="/" end>
+            Dashboard
+          </NavLink>
+          <NavLink to="/validation-rules">Validation rules</NavLink>
+        </nav>
         {user && <span>{user.email}</span>}
         <LogoutButton />
       </header>

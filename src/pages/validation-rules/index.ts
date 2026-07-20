@@ -1,0 +1,1 @@
+export { ValidationRulesPage } from './ValidationRulesPage'
