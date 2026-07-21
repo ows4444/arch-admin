@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useToggleRule } from '../../features/validation-rules/toggle-rule'
 import { useDeleteRule } from '../../features/validation-rules/delete-rule'
 import type { ValidationRule } from '../../entities/validation-rule'
@@ -5,6 +6,10 @@ import type { ValidationRule } from '../../entities/validation-rule'
 export function RulesTable({ rules, targetType }: { rules: ValidationRule[]; targetType: string }) {
   const toggleRule = useToggleRule(targetType)
   const deleteRule = useDeleteRule(targetType)
+  // Inline two-step confirm rather than a modal: this is the only
+  // destructive-delete UI in the app today, so a shared dialog primitive
+  // would be premature (.ci.loop §5). Only one row confirms at a time.
+  const [confirmingId, setConfirmingId] = useState<number | null>(null)
 
   if (rules.length === 0) {
     return (
@@ -53,14 +58,41 @@ export function RulesTable({ rules, targetType }: { rules: ValidationRule[]; tar
                   <span className="switch-track" />
                   <span className="switch-thumb" />
                 </span>
-                <button
-                  type="button"
-                  className="btn btn--danger btn--sm"
-                  disabled={deleteRule.isPending}
-                  onClick={() => deleteRule.mutate(rule.id)}
-                >
-                  Delete
-                </button>
+                {confirmingId === rule.id ? (
+                  <>
+                    <button
+                      type="button"
+                      className="btn btn--danger btn--sm"
+                      disabled={deleteRule.isPending}
+                      aria-label={`Confirm delete rule for ${rule.field}`}
+                      onClick={() => {
+                        setConfirmingId(null)
+                        deleteRule.mutate(rule.id)
+                      }}
+                    >
+                      {deleteRule.isPending ? 'Deleting…' : 'Confirm delete'}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn--ghost btn--sm"
+                      disabled={deleteRule.isPending}
+                      aria-label={`Cancel deleting rule for ${rule.field}`}
+                      onClick={() => setConfirmingId(null)}
+                    >
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    className="btn btn--danger btn--sm"
+                    disabled={deleteRule.isPending}
+                    aria-label={`Delete rule for ${rule.field}`}
+                    onClick={() => setConfirmingId(rule.id)}
+                  >
+                    Delete
+                  </button>
+                )}
               </div>
             </td>
           </tr>

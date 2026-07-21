@@ -113,3 +113,61 @@ PASS
 ## Next Loop
 
 - If any other slice in this app has a text input driving a TanStack Query key directly (grep for `useState` immediately followed by a query hook call using that state), cross-check it for the same missing-debounce pattern.
+
+---
+
+# Loop 003
+
+**Slice:** pages/validation-rules
+**Date:** 2026-07-22
+
+## Goal
+
+Fix the missing delete confirmation flagged in a prior session summary: `RulesTable`'s Delete button fired `deleteRule.mutate(rule.id)` immediately on click, with no confirmation step at all — a destructive action one misclick away, per direct user request.
+
+## Files Reviewed
+
+- `pages/validation-rules/RulesTable.tsx`
+- `features/validation-rules/delete-rule/use-delete-rule.ts` (unchanged — confirmed the mutation itself was correct; the gap was purely at the call site)
+
+## Problems Found
+
+**Critical**
+- None
+
+**High**
+- `RulesTable`'s Delete button called `deleteRule.mutate(rule.id)` directly in its `onClick`, with no confirmation step. A single misclick permanently deletes a validation rule (no undo, no soft-delete on the backend per `entities/validation-rule/ARCH.md`).
+
+**Medium**
+- None
+
+**Low**
+- None
+
+## Changes Made
+
+- `RulesTable.tsx`: added a `confirmingId` state (one row confirms at a time). Clicking Delete now shows "Confirm delete" + "Cancel" in place of the single Delete button; only clicking "Confirm delete" fires the mutation. Both new buttons carry field-specific `aria-label`s, matching the existing convention on the toggle switch and original Delete button.
+
+## Why
+
+Chose an inline two-step confirm over a modal/dialog primitive: this is the only destructive-delete UI in the app today (role/permission creation isn't destructive, grant/revoke are reversible), so building a generic shared confirmation-dialog component now would be premature sharing per `.ci.loop` §5 — no second call site exists yet to justify the shared abstraction. If a second destructive-delete flow is added later (e.g. deleting a role), revisit whether the pattern should graduate to a shared primitive.
+
+## Tests
+
+No automated tests exist yet (known gap). Manually verified in-browser against a mocked `fetch` (the live backend still 403s `GET /validation-rules` for the available test account, same blocker as Loop 001/002 — mocking was necessary to get a rule row rendered at all): Delete → Confirm delete/Cancel appear in place of Delete; Cancel reverts cleanly to the single Delete button with no request sent; Delete → Confirm delete fires exactly one `DELETE /api/validation-rules/{id}` request.
+
+## Build
+
+PASS
+
+## Lint
+
+PASS
+
+## Remaining TODO
+
+- Same live-backend verification blocker as every prior loop on this slice — re-verify once a privileged test account exists.
+
+## Next Loop
+
+- If a second destructive-delete UI is added anywhere in this app, revisit whether this inline two-step pattern should become a shared `shared/ui` primitive rather than being reimplemented per call site.
