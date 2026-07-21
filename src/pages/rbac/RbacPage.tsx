@@ -32,7 +32,11 @@ export function RbacPage() {
 
       <div className="section">
         <h2 className="section-heading">Roles</h2>
-        {roles.isPending && <p className="status-message status-message--muted">Loading…</p>}
+        {roles.isPending && (
+          <p className="status-message status-message--muted" role="status">
+            Loading…
+          </p>
+        )}
         {roles.isError && (
           <div className="status-message status-message--error">
             <span>Couldn't load roles.</span>

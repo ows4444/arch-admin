@@ -15,7 +15,7 @@ export function RequireAuth({ children }: { children: ReactNode }) {
   }
 
   if (isPending) {
-    return <p>Loading…</p>
+    return <p role="status">Loading…</p>
   }
 
   return <>{children}</>

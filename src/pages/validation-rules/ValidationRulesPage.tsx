@@ -31,7 +31,11 @@ export function ValidationRulesPage() {
       {targetType && (
         <>
           <div className="section">
-            {rules.isPending && <p className="status-message status-message--muted">Loading…</p>}
+            {rules.isPending && (
+              <p className="status-message status-message--muted" role="status">
+                Loading…
+              </p>
+            )}
             {rules.isError && (
               <div className="status-message status-message--error">
                 <span>Couldn't load rules for {targetType}.</span>
