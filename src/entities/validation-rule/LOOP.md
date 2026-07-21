@@ -54,3 +54,63 @@ PASS
 ## Next Loop
 
 - RBAC roles/permissions screen (`auth-rbac` endpoints) — natural next resource screen, same pattern.
+
+---
+
+# Loop 002
+
+**Slice:** entities/validation-rule
+**Date:** 2026-07-21
+
+## Goal
+
+Second Improvement Loop pass over this slice in isolation, checking for drift against `ARCH.md` and the standard Section 2 checklist.
+
+## Files Reviewed
+
+- `entities/validation-rule/types.ts`
+- `entities/validation-rule/use-validation-rules.ts`
+- `entities/validation-rule/index.ts`
+- `entities/validation-rule/ARCH.md` (cross-checked — no drift)
+
+## Problems Found
+
+**Critical**
+- None
+
+**High**
+- None
+
+**Medium**
+- None
+
+**Low**
+- None — `validationRulesQueryKey(targetType)` stays parameterized and consistent with its documented design, `useValidationRules` correctly gates on `targetType.length > 0`, no duplicated logic against `entities/rbac`'s equivalent (`useRoles`) beyond the intentionally identical TanStack Query shape.
+
+## Changes Made
+
+- None. Reviewed and confirmed the slice remains correct, minimal, and consistent with sibling `entities/rbac` — no change clears the bar for `.ci.loop` §19 ("never refactor code that already satisfies readability, maintainability, correctness").
+
+## Why
+
+N/A — no change made.
+
+## Tests
+
+No automated tests exist yet (known gap, unchanged from Loop 001).
+
+## Build
+
+PASS
+
+## Lint
+
+PASS
+
+## Remaining TODO
+
+- Same as Loop 001: re-verify create/toggle/delete against a 200 response once a privileged test account exists; still blocked, not resolvable from this pass.
+
+## Next Loop
+
+- No known follow-up specific to this slice's code.

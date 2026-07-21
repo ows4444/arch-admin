@@ -62,3 +62,61 @@ PASS
 ## Next Loop
 
 - Apply the same design system to the RBAC roles/permissions screen when it's built, rather than reinventing patterns.
+
+---
+
+# Loop 002
+
+**Slice:** widgets/app-shell
+**Date:** 2026-07-21
+
+## Goal
+
+Second Improvement Loop pass over `AppShell.tsx` itself (Loop 001 was a cross-cutting design-system pass touching many files; this pass is scoped to the widget's own component).
+
+## Files Reviewed
+
+- `widgets/app-shell/AppShell.tsx`
+- `widgets/app-shell/index.ts`
+
+## Problems Found
+
+**Critical**
+- None
+
+**High**
+- None
+
+**Medium**
+- None
+
+**Low**
+- None — layer boundaries are respected (imports `features/auth/logout`, `entities/session`, `shared/ui`; nothing upstream), the skip-link + `id="main-content"`/`tabIndex={-1}` pattern for keyboard/screen-reader users is present and correct, `NavLink`'s built-in `aria-current="page"` handles active-route indication without custom ARIA. `react-router-dom`'s `NavLink`/`Outlet` are used as intended, no prop drilling.
+
+## Changes Made
+
+- None. No issue found that clears the `.ci.loop` §19 bar for a justified change.
+
+## Why
+
+N/A — no change made.
+
+## Tests
+
+No automated tests exist yet (known gap).
+
+## Build
+
+PASS
+
+## Lint
+
+PASS
+
+## Remaining TODO
+
+- Visually re-confirm the light color-scheme branch (carried over from Loop 001, still open).
+
+## Next Loop
+
+- No new follow-up from this pass beyond the carried-over Loop 001 TODO.

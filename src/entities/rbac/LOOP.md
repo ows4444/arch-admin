@@ -71,3 +71,64 @@ PASS
 - Backend: request a `GET /auth/permissions` endpoint and a minimal user-list/search endpoint — both are blocking a fuller RBAC UI (permission browsing without going through roles; user↔role assignment at all).
 - Once available, add `features/rbac/assign-user-role`/`revoke-user-role` per `entities/rbac/ARCH.md` Open Questions.
 - Accessibility and live-backend verification (see Remaining TODO) before this screen is considered done per `.ci.loop` Definition of Done.
+
+---
+
+# Loop 002
+
+**Slice:** entities/rbac
+**Date:** 2026-07-21
+
+## Goal
+
+Second Improvement Loop pass, reviewing this slice on its own (independent of the `features/rbac/*`/`pages/rbac` build recorded in Loop 001) for drift, duplication, and the standard Section 2 checklist.
+
+## Files Reviewed
+
+- `entities/rbac/types.ts`
+- `entities/rbac/use-roles.ts`
+- `entities/rbac/known-permissions-store.ts`
+- `entities/rbac/index.ts`
+- `entities/rbac/ARCH.md` (cross-checked — implementation still matches the documented decisions, no drift)
+
+## Problems Found
+
+**Critical**
+- None
+
+**High**
+- None
+
+**Medium**
+- None
+
+**Low**
+- `useKnownPermissions()` recomputes `Object.values(byName).sort(...)` on every call, returning a new array reference each render even when `byName` hasn't changed — considered under §7 ("selector usage to avoid over-rendering"). Not fixed: the permission catalog is small (dozens of entries at most for an admin console), the recompute is O(n log n) on a tiny n, and memoizing it would add a `useMemo`/custom-equality dependency for no measurable benefit — exactly the "premature optimization" `.ci.loop` §5 warns against. Documented here as a deliberate no-op rather than an overlooked issue.
+
+## Changes Made
+
+- None. The slice matches its `ARCH.md`, has no duplicated logic, and the one candidate issue found (selector re-creation) doesn't clear the bar for a justified change per §19 ("never refactor code that already satisfies... correctness").
+
+## Why
+
+N/A — no change made.
+
+## Tests
+
+No automated tests exist yet (known gap, unchanged from Loop 001).
+
+## Build
+
+PASS
+
+## Lint
+
+PASS
+
+## Remaining TODO
+
+- Same as Loop 001: end-to-end verification against a live backend, accessibility spot-check — still blocked on backend/test-account availability, not something resolvable from this pass.
+
+## Next Loop
+
+- Revisit `useKnownPermissions` memoization only if a real render-cost problem is observed (profiler data), not preemptively.
