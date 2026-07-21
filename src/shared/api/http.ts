@@ -25,7 +25,12 @@ export async function http<T>(path: string, options: HttpRequestOptions = {}): P
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...rest,
     headers: {
-      'Content-Type': 'application/json',
+      // Only set when there's a body to describe: `application/json` isn't a
+      // CORS-simple header value, so attaching it to every request (including
+      // bodiless GETs) forces a preflight OPTIONS round-trip the backend
+      // doesn't implement (see ARCH.md/vite.config.ts) once this ever talks
+      // cross-origin instead of through the dev proxy.
+      ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
       ...headers,
     },
     body: body === undefined ? undefined : JSON.stringify(body),

@@ -30,6 +30,18 @@ function withAuthHeader(options: HttpRequestOptions, token: string | null): Http
   }
 }
 
+/** Refreshes the session and retries `path` with the new access token, clearing the session on failure. */
+async function refreshAndRetry<T>(path: string, options: HttpRequestOptions): Promise<T> {
+  try {
+    const session = await refreshSession()
+    useSessionStore.getState().setSession(session)
+    return await http<T>(path, withAuthHeader(options, session.accessToken))
+  } catch (refreshError) {
+    useSessionStore.getState().clearSession()
+    throw refreshError
+  }
+}
+
 /** Attaches the current access token and retries once via refresh on a 401. */
 export async function authFetch<T>(path: string, options: HttpRequestOptions = {}): Promise<T> {
   const { accessToken, refreshToken } = useSessionStore.getState()
@@ -39,14 +51,7 @@ export async function authFetch<T>(path: string, options: HttpRequestOptions = {
   // is still valid. Refresh proactively in that case instead of firing a
   // request that's guaranteed to 401.
   if (!accessToken && refreshToken) {
-    try {
-      const session = await refreshSession()
-      useSessionStore.getState().setSession(session)
-      return await http<T>(path, withAuthHeader(options, session.accessToken))
-    } catch (refreshError) {
-      useSessionStore.getState().clearSession()
-      throw refreshError
-    }
+    return refreshAndRetry<T>(path, options)
   }
 
   try {
@@ -60,13 +65,6 @@ export async function authFetch<T>(path: string, options: HttpRequestOptions = {
       throw error
     }
 
-    try {
-      const session = await refreshSession()
-      useSessionStore.getState().setSession(session)
-      return await http<T>(path, withAuthHeader(options, session.accessToken))
-    } catch (refreshError) {
-      useSessionStore.getState().clearSession()
-      throw refreshError
-    }
+    return refreshAndRetry<T>(path, options)
   }
 }
