@@ -7,14 +7,17 @@ export function DashboardPage() {
         <h1>Dashboard</h1>
       </div>
       <div className="callout">
-        <h2>Validation rules is online</h2>
+        <h2>Validation rules and RBAC are online</h2>
         <p>
-          It's the only console available right now. Roles and permissions are next — for now,
-          head to validation rules to review or add rules for a target type.
+          Manage field-level validation rules for a target type, or manage roles and the
+          permissions granted to them.
         </p>
-        <div>
+        <div className="callout-actions">
           <Link to="/validation-rules" className="btn btn--primary">
             Go to validation rules
+          </Link>
+          <Link to="/rbac" className="btn btn--ghost">
+            Go to roles &amp; permissions
           </Link>
         </div>
       </div>

@@ -1,12 +1,21 @@
-import { useId, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { useValidationRules } from '../../entities/validation-rule'
 import { CreateRuleForm } from '../../features/validation-rules/create-rule'
 import { RulesTable } from './RulesTable'
 
 export function ValidationRulesPage() {
   const [targetType, setTargetType] = useState('')
+  const [debouncedTargetType, setDebouncedTargetType] = useState('')
   const targetTypeId = useId()
-  const rules = useValidationRules(targetType)
+  const rules = useValidationRules(debouncedTargetType)
+
+  // Without this, every keystroke changes the TanStack Query key and fires
+  // its own request — typing a 13-character target type sent 13 separate
+  // GETs to a live backend (observed in-browser, see LOOP.md).
+  useEffect(() => {
+    const timeout = setTimeout(() => setDebouncedTargetType(targetType), 400)
+    return () => clearTimeout(timeout)
+  }, [targetType])
 
   return (
     <section>
