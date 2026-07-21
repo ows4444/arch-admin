@@ -171,3 +171,51 @@ PASS
 ## Next Loop
 
 - If a second destructive-delete UI is added anywhere in this app, revisit whether this inline two-step pattern should become a shared `shared/ui` primitive rather than being reimplemented per call site.
+
+---
+
+# Loop 004
+
+**Slice:** pages/validation-rules
+**Date:** 2026-07-22
+
+## Goal
+
+Close out the live-backend verification blocker carried since Loop 001, and specifically verify Loop 003's delete-confirmation fix against a real `DELETE`, not just a mocked one.
+
+## Files Reviewed
+
+- `pages/validation-rules/ValidationRulesPage.tsx`, `RulesTable.tsx` (no code change — verification only)
+
+## Problems Found
+
+**Critical/High/Medium/Low**
+- None in the application code. One process note: the toggle switch's `<input>` (opacity-0, absolutely positioned, per `index.css`'s `.switch input`) is small enough (34×20px) that synthetic/automated clicks at approximate coordinates missed it entirely with no error and no request — cost real debugging time before being traced to click precision, not app logic (a genuine `element.click()` toggled it correctly on the first try). Not a code defect — native checkbox click targets this small are a normal, accessible pattern (the visual `.switch` box itself defines the hit area) — but worth remembering if a future automated-testing pass (Playwright, once a test runner exists) targets this element: use a locator-based click, not raw coordinates.
+
+## Changes Made
+
+- None.
+
+## Why
+
+N/A — no change made; this loop closes a verification gap.
+
+## Tests
+
+Manually verified the full create → toggle-off → toggle-on → delete-confirm → delete happy path end-to-end against a live backend (`smoke-test@example.com`, now privileged — see `entities/rbac/ARCH.md`'s Amendment), confirming each step via response inspection (not just UI appearance): `POST` 201 with the correct `targetType` persisted, `PATCH` 200 reflecting the toggled `enabled` state, and Loop 003's confirm-dialog fix correctly gated the real `DELETE` (200) behind the Confirm/Cancel step rather than firing on the first click.
+
+## Build
+
+PASS (no change)
+
+## Lint
+
+PASS (no change)
+
+## Remaining TODO
+
+- None. This was the last open item for this slice.
+
+## Next Loop
+
+- No known follow-up.

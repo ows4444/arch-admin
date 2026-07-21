@@ -196,3 +196,54 @@ PASS
 ## Next Loop
 
 - If another slice's Zustand selector follows this same "derive inline in the selector" pattern, cross-check it for the same bug (§7's "selector usage" checklist should treat referential stability as a correctness property, not just a performance one, for any selector whose result feeds a render).
+
+---
+
+# Loop 004
+
+**Slice:** entities/rbac
+**Date:** 2026-07-22
+
+## Goal
+
+Close out the create/grant/revoke end-to-end verification blocker carried since Loop 001, now that a privileged test account exists.
+
+## Files Reviewed
+
+- `entities/rbac/use-roles.ts`, `known-permissions-store.ts` (no code change — verification only)
+
+## Problems Found
+
+**Critical/High/Medium**
+- None.
+
+**Low**
+- While verifying, discovered `known-permissions-store.ts`'s `useKnownPermissions()` correctly accumulates a newly-created permission (`validation-rules:manage`, created live during this verification) into the checklist shown by `CreateRoleForm`/`RoleCard` without a page reload — confirms the accumulator design in `ARCH.md` works as documented, not just in theory. Noted as a positive finding, not a defect.
+
+## Changes Made
+
+- None.
+
+## Why
+
+N/A — no change made; this loop closes a verification gap, not a code gap.
+
+## Tests
+
+Manually verified end-to-end against a live backend, using `smoke-test@example.com` after it was granted the seeded `admin` role (see `ARCH.md`'s Amendment): created a permission (`validation-rules:manage`, `201`), granted it to the `admin` role (`201`), revoked it (`200`), re-granted it (`201`), and created a role (`201`) — all confirmed via response inspection, not just UI appearance. The test role was deleted directly via the dev DB afterward (no `DELETE /auth/roles/{name}` endpoint exists on the backend to do this through the API) to avoid leaving stray data.
+
+## Build
+
+PASS (no change)
+
+## Lint
+
+PASS (no change)
+
+## Remaining TODO
+
+- Accessibility spot-check, still outstanding from Loop 001 — unrelated to this loop's scope.
+
+## Next Loop
+
+- No known follow-up specific to the live-verification gap; only the pre-existing accessibility TODO remains.

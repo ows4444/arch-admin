@@ -56,7 +56,7 @@ Fetch-on-render via TanStack Query, consistent with the rest of the app. No prer
 - Backend: add `GET /auth/permissions` to remove the need for the known-permissions accumulator entirely.
 - Backend: add a user-list/search endpoint (even a minimal `GET /users?search=`) so user↔role assignment can be built — currently impossible to build without one.
 - Once a user-lookup endpoint exists, add `features/rbac/assign-user-role` and `features/rbac/revoke-user-role` following the same grant/revoke mutation pattern as permissions.
-- Re-verify this screen against a privileged test account — same blocker noted in `entities/validation-rule/ARCH.md` (available test account has no `roles:manage` permission, so this build could not be exercised against real 200 responses; verified instead via code review against the backend contract and the existing `authFetch`/error-state conventions).
+- ~~Re-verify this screen against a privileged test account...~~ **Resolved 2026-07-22:** granted `smoke-test@example.com` the seeded `admin` role (`roles:manage`) via a direct DB write against the local dev MySQL — the manual/ops step `libs/auth`'s `SeedRolesManagePermission1753100000000` migration comment explicitly documents as the intended way to bootstrap the first admin, since auto-granting it to a registered user would be a real security decision made silently. Full create-role/create-permission/grant/revoke flow then verified end-to-end against real responses (see `entities/rbac/LOOP.md` Loop 003). This account is now genuinely reusable for future verification, not a one-off.
 
 ## Amendment (Swagger re-check, 2026-07-22)
 

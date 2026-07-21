@@ -114,3 +114,51 @@ PASS
 ## Next Loop
 
 - No known follow-up specific to this slice's code.
+
+---
+
+# Loop 003
+
+**Slice:** entities/validation-rule
+**Date:** 2026-07-22
+
+## Goal
+
+Close out the Loop 001/002 blocker: re-verify `useValidationRules` against a real 200 response now that a privileged test account exists.
+
+## Files Reviewed
+
+- `entities/validation-rule/use-validation-rules.ts` (no code change — verification only)
+
+## Problems Found
+
+**Critical/High/Medium/Low**
+- None. Confirms Loop 002's conclusion: the code was already correct, only the live verification was missing.
+
+## Changes Made
+
+- None.
+
+## Why
+
+N/A — no change made; this loop closes a verification gap, not a code gap.
+
+## Tests
+
+Manually verified end-to-end against a live backend (`smoke-test@example.com`, now granted `roles:manage` + `validation-rules:manage` via the seeded `admin` role — see `entities/rbac/ARCH.md`'s Amendment for how): `GET /validation-rules?targetType=...` returns `200` with the real array (previously only the `401`/`403` paths had been exercised). Query key scoping and the `enabled: targetType.length > 0` gate both behaved exactly as designed against real data.
+
+## Build
+
+PASS (no change)
+
+## Lint
+
+PASS (no change)
+
+## Remaining TODO
+
+- None. This was the last open item for this slice.
+
+## Next Loop
+
+- No known follow-up.

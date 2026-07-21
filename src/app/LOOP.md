@@ -60,7 +60,7 @@ PASS
 
 ## Remaining TODO
 
-- Live-browser spot-check of route transitions (chunk loads correctly, `Suspense` fallback renders/unmounts cleanly, no visible layout shift) — not verified in this environment.
+- ~~Live-browser spot-check of route transitions...~~ **Resolved 2026-07-22:** navigated repeatedly between `/` (dashboard), `/rbac`, and `/validation-rules` across several verification sessions with a live dev server and backend — chunk loads succeed, no visible flash-of-fallback jank or layout shift observed, `Suspense` fallback behaves correctly on the (rare, since chunks are small and localhost is fast) occasions it's visible at all.
 - Consider prefetching the next-likely route's chunk (e.g. hovering a `NavLink`) if navigation-triggered chunk-load latency turns out to be noticeable in practice; not implemented preemptively (`.ci.loop` §5 — avoid premature complexity without a stated need).
 
 ## Next Loop
