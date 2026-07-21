@@ -132,3 +132,67 @@ PASS
 ## Next Loop
 
 - Revisit `useKnownPermissions` memoization only if a real render-cost problem is observed (profiler data), not preemptively.
+
+---
+
+# Loop 003
+
+**Slice:** entities/rbac
+**Date:** 2026-07-22
+
+## Goal
+
+Fix a live crash found by manually exercising `/rbac` in-browser against a running backend (first time this slice was verified end-to-end, per the Remaining TODO in Loop 001/002).
+
+## Files Reviewed
+
+- `entities/rbac/known-permissions-store.ts`
+- `entities/rbac/use-roles.ts`
+- `pages/rbac/RbacPage.tsx`
+
+## Problems Found
+
+**Critical**
+- `/rbac` crashed on load with "Maximum update depth exceeded". Root cause: `useKnownPermissions()`'s Zustand selector did `Object.values(state.byName).sort(...)` inline, allocating a new array reference on every call — including calls React's `useSyncExternalStore` makes purely to check for changes. A selector with no referential stability makes every check look like a change, producing an infinite synchronous re-render loop. This is the same code Loop 002 examined and declined to change, filed as a "Low / premature optimization" concern — that assessment was wrong: it's not a performance nit, it's a correctness bug that crashes the page. Corrected here.
+
+**High**
+- None
+
+**Medium**
+- None
+
+**Low**
+- None
+
+## Changes Made
+
+- `known-permissions-store.ts`: `useKnownPermissions()` now subscribes to the stable `state.byName` object directly and derives the sorted array via `useMemo(() => ..., [byName])`, instead of allocating inline inside the selector. Output is unchanged (same sorted `Permission[]`); only the reference stability changed.
+
+## Why
+
+Loop 002's rationale ("small n, negligible recompute cost, memoizing is premature optimization") addressed the wrong question — the bug isn't recompute cost, it's that `useSyncExternalStore` requires `getSnapshot` to return a stable reference when the underlying state hasn't changed, or React cannot terminate its change-detection loop. This only surfaced now because Loop 001/002 were never able to exercise the route against a live backend (Docker unavailable in that environment); this loop had a running backend and an authenticated session, which is what actually triggered the crash.
+
+## Tests
+
+No automated tests exist yet (known gap, unchanged). Manually verified in-browser:
+- Signed in as `smoke-test@example.com`, navigated to `/rbac` — previously crashed immediately with the render-loop error; now renders correctly.
+- `GET /auth/roles` returns `403` for this account (it lacks `roles:manage`-equivalent permission) — confirmed this is a legitimate backend authorization response, not a frontend bug. The "Couldn't load roles" error state renders correctly for this case.
+
+**Still not verified:** the actual grant/revoke flow, since no available test account has permission to list roles. Same blocker as Loop 001/002, now one layer further in (auth works, listing roles is gated).
+
+## Build
+
+PASS
+
+## Lint
+
+PASS
+
+## Remaining TODO
+
+- End-to-end verify create/grant/revoke once a `roles:manage`-permitted test account is available.
+- Accessibility spot-check, still outstanding from Loop 001.
+
+## Next Loop
+
+- If another slice's Zustand selector follows this same "derive inline in the selector" pattern, cross-check it for the same bug (§7's "selector usage" checklist should treat referential stability as a correctness property, not just a performance one, for any selector whose result feeds a render).

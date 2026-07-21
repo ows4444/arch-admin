@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { create } from 'zustand'
 import type { Permission } from './types'
 
@@ -26,7 +27,15 @@ export const useKnownPermissionsStore = create<KnownPermissionsState>((set) => (
 }))
 
 export function useKnownPermissions(): Permission[] {
-  return useKnownPermissionsStore((state) =>
-    Object.values(state.byName).sort((a, b) => a.name.localeCompare(b.name)),
+  // `byName` is referentially stable across renders unless `addPermissions`
+  // actually changes it — deriving the sorted array with useMemo (rather than
+  // inline in the Zustand selector) keeps the return value stable too. A
+  // selector that allocates a new array on every call defeats
+  // useSyncExternalStore's change detection and causes an infinite render
+  // loop, since every call looks like a change.
+  const byName = useKnownPermissionsStore((state) => state.byName)
+  return useMemo(
+    () => Object.values(byName).sort((a, b) => a.name.localeCompare(b.name)),
+    [byName],
   )
 }
