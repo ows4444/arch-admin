@@ -1,10 +1,10 @@
+import { Suspense } from 'react'
 import { createBrowserRouter } from 'react-router-dom'
-import { LoginPage } from '../../pages/login'
-import { DashboardPage } from '../../pages/dashboard'
-import { ValidationRulesPage } from '../../pages/validation-rules'
-import { RbacPage } from '../../pages/rbac'
 import { AppShell } from '../../widgets/app-shell'
+import { LoginPage } from '../../pages/login'
 import { RequireAuth } from './RequireAuth'
+import { DashboardPage, ValidationRulesPage, RbacPage } from './lazy-pages'
+import { RouteFallback } from './RouteFallback'
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -16,9 +16,30 @@ export const router = createBrowserRouter([
       </RequireAuth>
     ),
     children: [
-      { index: true, element: <DashboardPage /> },
-      { path: 'validation-rules', element: <ValidationRulesPage /> },
-      { path: 'rbac', element: <RbacPage /> },
+      {
+        index: true,
+        element: (
+          <Suspense fallback={<RouteFallback />}>
+            <DashboardPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'validation-rules',
+        element: (
+          <Suspense fallback={<RouteFallback />}>
+            <ValidationRulesPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'rbac',
+        element: (
+          <Suspense fallback={<RouteFallback />}>
+            <RbacPage />
+          </Suspense>
+        ),
+      },
     ],
   },
 ])
