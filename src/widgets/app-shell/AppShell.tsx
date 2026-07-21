@@ -22,6 +22,7 @@ export function AppShell() {
             Dashboard
           </NavLink>
           <NavLink to="/validation-rules">Validation rules</NavLink>
+          <NavLink to="/rbac">Roles &amp; permissions</NavLink>
         </nav>
         <div className="sidebar-account">
           {user && <span className="sidebar-account-email">{user.email}</span>}
