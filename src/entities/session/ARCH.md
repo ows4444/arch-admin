@@ -68,6 +68,7 @@ Fetch-on-render (TanStack Query) for all routes. CSR-only, no prerendering — n
 - Add a `Content-Security-Policy` header at the hosting/CDN layer before this ships past internal use — not yet configured.
 - Production CORS: the deployed frontend origin needs to be allow-listed on the backend once a deployment target is chosen; not yet actionable without that target.
 - `refreshTokenExpiresAt` is currently ~30 days from the backend — worth a conversation with backend owners about a shorter lifetime for an admin tool.
+- `POST /auth/register` and `POST /auth/logout-all` exist on the backend (confirmed against `/docs-json`, 2026-07-22) but have no frontend surface. Not built because: `register` implies self-service account creation, which an internal admin console likely shouldn't expose (accounts are presumably provisioned another way) — needs a product decision, not an engineering one, before building a page for it. `logout-all` ("sign out everywhere") is a reasonable security-page feature but wasn't asked for; low effort to add (mirrors `features/auth/logout`'s existing mutation shape) once there's a settings/security surface to put it on.
 
 ## Handoff to Improvement Loop
 

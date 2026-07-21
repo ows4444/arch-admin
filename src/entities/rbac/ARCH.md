@@ -58,6 +58,10 @@ Fetch-on-render via TanStack Query, consistent with the rest of the app. No prer
 - Once a user-lookup endpoint exists, add `features/rbac/assign-user-role` and `features/rbac/revoke-user-role` following the same grant/revoke mutation pattern as permissions.
 - Re-verify this screen against a privileged test account — same blocker noted in `entities/validation-rule/ARCH.md` (available test account has no `roles:manage` permission, so this build could not be exercised against real 200 responses; verified instead via code review against the backend contract and the existing `authFetch`/error-state conventions).
 
+## Amendment (Swagger re-check, 2026-07-22)
+
+Re-diffed this slice's assumptions against a live `/docs-json` fetch from the running backend. Result: no drift. `POST/DELETE /auth/users/{userId}/roles/{roleName}` still exist and are still the only user↔role endpoints — no `GET /users`/search endpoint has been added, so the HIGH decision above ("skip this screen until a user-lookup endpoint exists") still holds exactly as written. Logged here only to record that this was actively re-verified against the current backend contract, not assumed stale.
+
 ## Handoff to Improvement Loop
 
 - Public slice API surface:
