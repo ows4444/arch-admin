@@ -46,7 +46,7 @@ export function ValidationRulesPage() {
               </p>
             )}
             {rules.isError && (
-              <div className="status-message status-message--error">
+              <div className="status-message status-message--error" role="alert">
                 <span>Couldn't load rules for {targetType}.</span>
                 <button type="button" className="btn btn--ghost btn--sm" onClick={() => rules.refetch()}>
                   Retry

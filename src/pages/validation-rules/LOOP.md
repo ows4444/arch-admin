@@ -219,3 +219,57 @@ PASS (no change)
 ## Next Loop
 
 - No known follow-up.
+
+---
+
+# Loop 005
+
+**Slice:** pages/validation-rules
+**Date:** 2026-07-23
+
+## Goal
+
+Cross-port the `role="alert"` fix from `pages/rbac/RbacPage.tsx` (`entities/rbac/LOOP.md` Loop 005): the list-level fetch-error message here had the same gap — no announcement to screen readers when `GET /validation-rules` fails — flagged during that RBAC accessibility spot-check as an identical pattern in this sibling page.
+
+## Files Reviewed
+
+- `pages/validation-rules/ValidationRulesPage.tsx`
+
+## Problems Found
+
+**Critical/High**
+- None.
+
+**Medium**
+- The `rules.isError` fetch-error `<div>` had no `role="alert"`/`aria-live`, unlike the loading state (`role="status"`) right above it and unlike the equivalent error surfaces in `CreateRuleForm`. Silent failure for screen-reader users on a live `GET` error. Fixed.
+
+**Low**
+- None.
+
+## Changes Made
+
+- `pages/validation-rules/ValidationRulesPage.tsx`: added `role="alert"` to the rules-fetch-error `<div>`.
+
+## Why
+
+Matches the fix already applied to the identical pattern in `pages/rbac/RbacPage.tsx` — same component shape (list page with a top-level fetch-error banner), same gap, same fix, for consistency across sibling list pages per `.ci.loop` §3 ("note if the fix pattern should be back-ported or cross-checked against another sibling slice").
+
+## Tests
+
+No test runner configured. Verified via code review (diff is a single `role="alert"` attribute, same as the already-verified RBAC fix) plus build/lint.
+
+## Build
+
+PASS
+
+## Lint
+
+PASS
+
+## Remaining TODO
+
+- None.
+
+## Next Loop
+
+- No known follow-up.

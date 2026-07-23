@@ -247,3 +247,69 @@ PASS (no change)
 ## Next Loop
 
 - No known follow-up specific to the live-verification gap; only the pre-existing accessibility TODO remains.
+
+---
+
+# Loop 005
+
+**Slice:** entities/rbac (+ pages/rbac)
+**Date:** 2026-07-23
+
+## Goal
+
+Close out the accessibility spot-check carried since Loop 001 (`.ci.loop` §11): focus order, keyboard operability, semantic structure, ARIA usage, screen-reader announcements, and contrast for the `/rbac` screen (`RbacPage`, `RoleCard`, `CreateRoleForm`, `CreatePermissionForm`).
+
+No live browser/screen-reader session was available this loop (would require signing in as `smoke-test@example.com`, whose password isn't stored anywhere in the repo by design — asked the user, who opted for a static/code-level review instead of supplying it). Findings below are from code + computed contrast ratios, not a live AT pass.
+
+## Files Reviewed
+
+- `pages/rbac/RbacPage.tsx`, `pages/rbac/RoleCard.tsx`
+- `features/rbac/create-role/CreateRoleForm.tsx`, `features/rbac/create-permission/CreatePermissionForm.tsx`
+- `widgets/app-shell/AppShell.tsx` (skip link / landmark / focus-on-navigate baseline this screen inherits)
+- `index.css` (`.checkbox-field`, `.token`, `.status-message*`, `.rbac-form-grid`, `.permission-checklist`, color tokens) — computed contrast ratios for `ink`/`text`/`text-muted`/`danger`/`accent` against their respective backgrounds; all ≥ 4.5:1 (lowest was `danger` on `danger-tint` at 4.68:1).
+- `pages/validation-rules/ValidationRulesPage.tsx` — cross-checked as the sibling list-page pattern.
+
+## Problems Found
+
+**Critical**
+- None.
+
+**High**
+- None.
+
+**Medium**
+- `RbacPage`'s top-level "Couldn't load roles" fetch-error message had no `role="alert"` (or any `aria-live`), so a screen-reader user gets no announcement when the roles list fails to load — silent failure. Inconsistent with every other error surface on the same screen: `CreateRoleForm`, `CreatePermissionForm`, and `RoleCard`'s grant/revoke error all use `role="alert"`. Fixed.
+
+**Low**
+- The same list-level-fetch-error-lacks-`role="alert"` gap also exists in the sibling `pages/validation-rules/ValidationRulesPage.tsx` — not fixed here (out of scope for an RBAC-scoped spot-check), flagged for its own slice's next loop.
+- No per-route `document.title` updates anywhere in the app (not RBAC-specific — an `app/`-level routing concern per `.ci.loop` §6/§11's focus/announcement rules). Not fixed here; noted for `app/LOOP.md`.
+
+## Changes Made
+
+- `pages/rbac/RbacPage.tsx`: added `role="alert"` to the roles-fetch-error `<div>`.
+
+## Why
+
+Screen-reader users need an explicit announcement when an async fetch fails silently in place — `role="alert"` (assertive live region) matches the pattern already used for every other error message on this screen, so this was a one-line consistency fix, not a new pattern.
+
+## Tests
+
+No test runner configured. Verified via code review + computed WCAG contrast ratios (see Files Reviewed). Live keyboard-nav/AT pass still not done — blocked on live-session credentials, tracked below.
+
+## Build
+
+PASS
+
+## Lint
+
+PASS
+
+## Remaining TODO
+
+- Live keyboard-navigation and screen-reader pass against the running `/rbac` page, once `smoke-test@example.com` credentials are available in-session (this loop only reviewed statically).
+- ~~Cross-port the `role="alert"` fix to `pages/validation-rules/ValidationRulesPage.tsx`...~~ **Resolved 2026-07-23:** done in `pages/validation-rules/LOOP.md` Loop 005.
+
+## Next Loop
+
+- If credentials become available, do the live pass and close the static-review caveat above.
+- Consider a per-route `document.title` convention at the `app/` level (affects all pages, not RBAC-specific) — flag in `app/LOOP.md`, not here.

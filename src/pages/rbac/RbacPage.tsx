@@ -38,7 +38,7 @@ export function RbacPage() {
           </p>
         )}
         {roles.isError && (
-          <div className="status-message status-message--error">
+          <div className="status-message status-message--error" role="alert">
             <span>Couldn't load roles.</span>
             <button type="button" className="btn btn--ghost btn--sm" onClick={() => roles.refetch()}>
               Retry
