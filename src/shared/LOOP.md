@@ -54,3 +54,56 @@ PASS
 ## Next Loop
 
 - No known follow-up specific to this slice; re-review if `http()` grows additional cross-cutting concerns (e.g. request cancellation, timeout) that sibling entities start reimplementing individually.
+
+---
+
+# Loop 002
+
+**Slice:** shared (ui/icons, ui/EmptyState)
+**Date:** 2026-07-23
+
+## Goal
+
+Whole-app UI/design polish pass (user-requested, general quality/consistency review). Add the two new `shared/ui` primitives it required: a small icon set and a unified empty-state component. Justified as shared per `.ci.loop` §5 ("Shared UI kit only when justified") — icons are used in both `widgets/app-shell` and `pages/dashboard`; `EmptyState` replaces three separate hand-rolled empty states across `pages/rbac` and `pages/validation-rules`.
+
+## Files Reviewed
+
+- `shared/ui/Logomark.tsx` (style reference — hand-rolled inline SVG, no icon library dependency)
+- Every existing "No X yet" plain-`<p>` empty state in the app (3 call sites, found via review of `RulesTable.tsx`, `RoleCard.tsx`, `RbacPage.tsx`)
+
+## Problems Found
+
+**Low**
+- Three independent hand-rolled empty states with no shared treatment — the only repeated UI pattern in the app that didn't already have one (buttons, status messages, tokens all do).
+- Sidebar nav and dashboard had no icons — see `widgets/app-shell/LOOP.md` Loop 003 and `pages/dashboard/LOOP.md` Loop 003 for the consuming-side changes.
+
+## Changes Made
+
+- New `shared/ui/icons.tsx`: `DashboardIcon`, `ValidationRulesIcon`, `RolesIcon` — small inline SVGs, `stroke="currentColor"`, same style as `Logomark.tsx`, no new dependency.
+- New `shared/ui/EmptyState.tsx`: `{ icon, children }` — icon in a circular `.empty-state-icon` badge + message via the existing `.status-message--muted` class (reused, not duplicated).
+- `shared/ui/index.ts`: exports both additions alongside `Logomark`.
+- `index.css`: new `.empty-state`, `.empty-state-icon` classes — additive only.
+
+## Why
+
+Three real call sites already existed for `EmptyState`, and two for the icons — both cross the "used in 2+ places" bar this codebase already applies (see `entities/rbac/ARCH.md`'s reasoning for `known-permissions-store.ts` as a comparable "justified shared abstraction" precedent).
+
+## Tests
+
+`npm run build` and `npm run lint` pass. Live-verified indirectly through the consuming slices (`widgets/app-shell`, `pages/dashboard`, `pages/rbac`, `pages/validation-rules` — see their own LOOP.md entries for the actual rendered checks).
+
+## Build
+
+PASS
+
+## Lint
+
+PASS
+
+## Remaining TODO
+
+- None.
+
+## Next Loop
+
+- No known follow-up.

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { RolesIcon, ValidationRulesIcon } from '../../shared/ui'
 
 export function DashboardPage() {
   return (
@@ -20,6 +21,19 @@ export function DashboardPage() {
             Go to roles &amp; permissions
           </Link>
         </div>
+      </div>
+
+      <div className="dashboard-links">
+        <Link to="/validation-rules" className="link-card">
+          <ValidationRulesIcon size={20} />
+          <h3 className="section-heading">Validation rules</h3>
+          <p>Field-level rules enforced against a target type before it's accepted.</p>
+        </Link>
+        <Link to="/rbac" className="link-card">
+          <RolesIcon size={20} />
+          <h3 className="section-heading">Roles &amp; permissions</h3>
+          <p>Manage roles, permissions, and which permissions each role grants.</p>
+        </Link>
       </div>
     </section>
   )

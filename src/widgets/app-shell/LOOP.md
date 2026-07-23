@@ -120,3 +120,53 @@ PASS
 ## Next Loop
 
 - No new follow-up from this pass beyond the carried-over Loop 001 TODO.
+
+---
+
+# Loop 003
+
+**Slice:** widgets/app-shell
+**Date:** 2026-07-23
+
+## Goal
+
+Whole-app UI/design polish pass (user-requested, general quality/consistency review). For this slice: the sidebar nav was plain text with no visual scanning aid — add icons.
+
+## Files Reviewed
+
+- `widgets/app-shell/AppShell.tsx`
+- `src/index.css` (`.sidebar-nav a`)
+
+## Problems Found
+
+**Low**
+- Sidebar nav links had no icon, unlike the rest of the app's use of `Logomark`'s hand-rolled-SVG style for brand identity. Not a defect, just thin.
+
+## Changes Made
+
+- `AppShell.tsx`: each `NavLink` now renders a matching icon (`DashboardIcon`/`ValidationRulesIcon`/`RolesIcon`, new in `shared/ui`) before its label.
+- `index.css`: `.sidebar-nav a` gained `gap: var(--space-3)` (previously undefined, relying on nothing) and `.sidebar-nav a svg { flex-shrink: 0; }`. Icons use `stroke="currentColor"` so the existing hover/active color transitions apply to them for free — no new CSS needed for icon color states.
+
+## Why
+
+Matches the existing hand-rolled-SVG icon convention (`Logomark.tsx`) rather than adding an icon library dependency; improves nav scannability with a small, low-risk change.
+
+## Tests
+
+`npm run build` and `npm run lint` pass. Live-verified in the authenticated Chrome tab: icons render at the correct size, inherit `currentColor` correctly in both the active (accent-tinted) and inactive nav states, no layout shift.
+
+## Build
+
+PASS
+
+## Lint
+
+PASS
+
+## Remaining TODO
+
+- Visually re-confirm the light color-scheme branch (carried over from Loop 001, still open — unrelated to this loop).
+
+## Next Loop
+
+- No new follow-up from this pass beyond the carried-over Loop 001 TODO.

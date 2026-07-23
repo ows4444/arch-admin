@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useToggleRule } from '../../features/validation-rules/toggle-rule'
 import { useDeleteRule } from '../../features/validation-rules/delete-rule'
+import { EmptyState, ValidationRulesIcon } from '../../shared/ui'
 import type { ValidationRule } from '../../entities/validation-rule'
 
 export function RulesTable({ rules, targetType }: { rules: ValidationRule[]; targetType: string }) {
@@ -13,9 +14,9 @@ export function RulesTable({ rules, targetType }: { rules: ValidationRule[]; tar
 
   if (rules.length === 0) {
     return (
-      <p className="status-message status-message--muted">
+      <EmptyState icon={<ValidationRulesIcon size={20} />}>
         No rules yet for <code className="token">{targetType}</code>. Add one below.
-      </p>
+      </EmptyState>
     )
   }
 
@@ -45,15 +46,18 @@ export function RulesTable({ rules, targetType }: { rules: ValidationRule[]; tar
             <td className="rule-message">{rule.message}</td>
             <td>
               <div className="rule-actions">
-                <span className="switch">
+                <span className="switch" data-pending={toggleRule.variables?.id === rule.id || undefined}>
                   <input
                     type="checkbox"
                     checked={rule.enabled}
-                    disabled={toggleRule.isPending}
                     aria-label={rule.enabled ? `Disable rule for ${rule.field}` : `Enable rule for ${rule.field}`}
-                    onChange={(event) =>
+                    onChange={(event) => {
+                      // Guarded here rather than via `disabled`: disabling the
+                      // switch the user just toggled force-blurs it, and focus
+                      // is never restored once the mutation settles.
+                      if (toggleRule.isPending) return
                       toggleRule.mutate({ id: rule.id, enabled: event.target.checked })
-                    }
+                    }}
                   />
                   <span className="switch-track" />
                   <span className="switch-thumb" />

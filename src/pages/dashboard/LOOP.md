@@ -112,3 +112,52 @@ PASS
 ## Next Loop
 
 - If a third console ships, re-check this page's copy again rather than assuming it still holds — this is the second time it's gone stale.
+
+---
+
+# Loop 003
+
+**Slice:** pages/dashboard
+**Date:** 2026-07-23
+
+## Goal
+
+Whole-app UI/design polish pass (user-requested, general quality/consistency review). For this slice: the page was a single floating callout with a lot of unused space below it — visually unbalanced, and didn't surface the two real destinations it describes in prose.
+
+## Files Reviewed
+
+- `pages/dashboard/DashboardPage.tsx`
+
+## Problems Found
+
+**Low**
+- Page felt visually thin relative to the rest of the app. Not a defect — this page is an intentional placeholder pending a real dashboard scope (unchanged, still tracked below) — but purely presentational balance was worth addressing without inventing data this app doesn't have.
+
+## Changes Made
+
+- Added two `.link-card` quick-links below the existing callout, one per real destination (`/validation-rules`, `/rbac`), each with an icon (reusing `ValidationRulesIcon`/`RolesIcon` from `shared/ui`, the same icons now used in the sidebar) + title + one-line description copied from each page's own header copy. Purely navigational — no new data fetching, no invented metrics.
+- `index.css`: new `.dashboard-links` (grid, `auto-fit`/`minmax`, same pattern as the existing `.rbac-form-grid`) and `.link-card` (extends `.card`'s visual language, adds a hover/focus affordance since it's a link) — both additive, no existing rules changed.
+
+## Why
+
+General visual balance improvement without overreaching into the actual "real dashboard" scope question (still open, still requires backend data this app doesn't expose yet).
+
+## Tests
+
+`npm run build` and `npm run lint` pass. Live-verified in the authenticated Chrome tab: both link cards render correctly, hover affordance works, links navigate to the correct routes.
+
+## Build
+
+PASS
+
+## Lint
+
+PASS
+
+## Remaining TODO
+
+- Revisit once a real dashboard (metrics/summary) is scoped — current content (callout + quick-links) is still an intentional placeholder, not a defect.
+
+## Next Loop
+
+- No known follow-up until dashboard scope is defined (Design Mode territory, not this loop).

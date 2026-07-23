@@ -273,3 +273,58 @@ PASS
 ## Next Loop
 
 - No known follow-up.
+
+---
+
+# Loop 006
+
+**Slice:** pages/validation-rules
+**Date:** 2026-07-23
+
+## Goal
+
+Whole-app UI/design polish pass (user-requested, general quality/consistency review). For this slice: unify the "No rules yet for X" empty state with the new shared `EmptyState` component, and fix the same disabled-checkbox focus-drop pattern found live in `entities/rbac/LOOP.md` Loop 006 — `RulesTable`'s enabled/disabled switch has the identical `disabled={toggleRule.isPending}` shape.
+
+## Files Reviewed
+
+- `pages/validation-rules/RulesTable.tsx`
+
+## Problems Found
+
+**Critical/High**
+- None.
+
+**Medium**
+- `RulesTable`'s rule-enabled `<span className="switch">` used `disabled={toggleRule.isPending}` on the input — same defect class as the RBAC checkbox: force-blurs the switch the user just toggled, focus never restored. Not yet verified live at the time this was flagged (RBAC only), but the code shape is identical, so fixed pre-emptively and then verified live (see Tests).
+
+**Low**
+- "No rules yet for `{targetType}`. Add one below." was a plain `<p>`, one of the three unstyled empty states in the app. Unified via `shared/ui/EmptyState`.
+
+## Changes Made
+
+- `RulesTable.tsx`: empty-rules message now renders through `<EmptyState icon={<ValidationRulesIcon size={20} />}>`.
+- `RulesTable.tsx`: removed `disabled={toggleRule.isPending}` from the switch input; guarded re-entrancy inline in the `onChange` handler instead (`if (toggleRule.isPending) return`). Added `data-pending={toggleRule.variables?.id === rule.id || undefined}` on the `.switch` wrapper (scoped to the specific row being toggled, using `toggleRule.variables` already exposed by the existing mutation hook) and a matching `.switch[data-pending]` CSS rule for the pending visual, replacing the native-`disabled` opacity.
+
+## Why
+
+Cross-porting the fix pattern from `entities/rbac/LOOP.md` Loop 006 per `.ci.loop` §3 ("note if the fix pattern should be back-ported... to another sibling slice") — same root cause, same shape, same fix.
+
+## Tests
+
+`npm run build` and `npm run lint` both pass. Live-verified: created a throwaway rule (`name equals "root"`) against the live backend, focused its enable/disable switch, toggled it off via Space — `document.activeElement` remained the switch `<input>` after the mutation settled, not `<body>`. Deleted the throwaway rule afterward (confirm-delete flow) to leave test data clean.
+
+## Build
+
+PASS
+
+## Lint
+
+PASS
+
+## Remaining TODO
+
+- None.
+
+## Next Loop
+
+- No known follow-up.

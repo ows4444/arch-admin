@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useKnownPermissions, useKnownPermissionsStore, useRoles } from '../../entities/rbac'
 import { CreatePermissionForm } from '../../features/rbac/create-permission'
 import { CreateRoleForm } from '../../features/rbac/create-role'
+import { EmptyState, RolesIcon } from '../../shared/ui'
 import { RoleCard } from './RoleCard'
 
 export function RbacPage() {
@@ -46,7 +47,7 @@ export function RbacPage() {
           </div>
         )}
         {roles.data && roles.data.length === 0 && (
-          <p className="status-message status-message--muted">No roles yet. Create one above.</p>
+          <EmptyState icon={<RolesIcon size={20} />}>No roles yet. Create one above.</EmptyState>
         )}
         {roles.data && roles.data.length > 0 && (
           <div className="role-list">

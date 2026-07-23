@@ -102,3 +102,60 @@ PASS (no change)
 ## Next Loop
 
 - No known follow-up.
+
+---
+
+# Loop 003
+
+**Slice:** pages/rbac
+**Date:** 2026-07-23
+
+## Goal
+
+Whole-app UI/design polish pass (user-requested, general quality/consistency review, not tied to a specific complaint). For this slice: unify the "No permissions exist yet." / "No roles yet." empty states with the new shared `EmptyState` component, and fix the live-verified focus-drop bug in `RoleCard`'s permission checklist (see `entities/rbac/LOOP.md` Loop 006 for how it was diagnosed).
+
+## Files Reviewed
+
+- `pages/rbac/RbacPage.tsx`, `pages/rbac/RoleCard.tsx`
+- `src/index.css` (existing `.checkbox-field`, `.status-message--muted` — reused, not replaced)
+
+## Problems Found
+
+**Critical/High**
+- None.
+
+**Medium**
+- `RoleCard`'s `disabled={isPending}` on every permission checkbox force-blurs the one the user just toggled and never restores focus (full diagnosis in `entities/rbac/LOOP.md` Loop 006). Fixed.
+
+**Low**
+- `RbacPage`'s "No roles yet." and `RoleCard`'s "No permissions exist yet." were two of three plain-`<p>` empty states in the app with no shared treatment, unlike every other repeated pattern (buttons, status messages, tokens). Addressed via the new `shared/ui/EmptyState` component (see `src/shared/LOOP.md`).
+
+## Changes Made
+
+- `RbacPage.tsx`: "No roles yet." now renders through `<EmptyState icon={<RolesIcon size={20} />}>`.
+- `RoleCard.tsx`: "No permissions exist yet." now renders through the same `EmptyState` component.
+- `RoleCard.tsx`: removed `disabled={isPending}` from the permission checkboxes. Re-entrancy is now guarded inside `togglePermission` (`if (isPending) return`) instead, so the checkbox never becomes unfocusable. Added `pendingPermissionName` (derived from `grantPermission.variables`/`revokePermission.variables`, both already exposed by the existing `useMutation` hooks — no new state) and a `data-pending` attribute on just the row whose mutation is in flight, styled via a new `.checkbox-field[data-pending]` CSS rule (opacity dim, matching the existing `.btn:disabled` visual language) instead of the native `disabled` attribute.
+
+## Why
+
+Consistency (empty states) and a confirmed live defect (focus drop) — both scoped to this slice's own files, not a re-litigation of any existing design decision.
+
+## Tests
+
+`npm run build` and `npm run lint` both pass. Live-verified in the authenticated Chrome tab against the running backend: focused "Revoke roles:manage from billing-clerk", toggled it off then back on via Space — focus stayed on the same checkbox both times (confirmed via `document.activeElement`), unlike before the fix where it dropped to `<body>`. Test data (the temporarily revoked permission) was restored before finishing.
+
+## Build
+
+PASS
+
+## Lint
+
+PASS
+
+## Remaining TODO
+
+- None.
+
+## Next Loop
+
+- No known follow-up.

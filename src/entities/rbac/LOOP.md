@@ -313,3 +313,57 @@ PASS
 
 - If credentials become available, do the live pass and close the static-review caveat above.
 - Consider a per-route `document.title` convention at the `app/` level (affects all pages, not RBAC-specific) — flag in `app/LOOP.md`, not here.
+
+---
+
+# Loop 006
+
+**Slice:** entities/rbac (+ pages/rbac)
+**Date:** 2026-07-23
+
+## Goal
+
+Close out the live keyboard-navigation pass carried since Loop 004/005, now that `smoke-test@example.com` was logged in interactively (user authenticated in the browser tab directly — password never entered by the agent, per this session's credential-handling rule).
+
+## Files Reviewed
+
+- `pages/rbac/RoleCard.tsx`, `pages/rbac/RbacPage.tsx` — live, in a real Chrome tab against the running dev server + backend.
+
+## Problems Found
+
+**Critical/High**
+- None.
+
+**Medium — confirmed live, not visible from static review**
+- `RoleCard`'s permission checkboxes used `disabled={isPending}` shared across the *entire* card. Disabling the checkbox a keyboard user just toggled force-blurs it (native browser behavior); nothing restores focus once the mutation resolves and it re-enables. Verified live: focused "Revoke roles:manage from billing-clerk", pressed Space, `document.activeElement` dropped to `<body>` after the mutation settled. On a screen whose core workflow is toggling many checkboxes across several role cards, this meant losing tab position after every single toggle. Fixed as part of this session's UI pass (see `pages/rbac/LOOP.md` Loop 002 for the fix and re-verification).
+
+**Process note**
+- The automated Chrome tab only has real OS focus when the physical window is foregrounded — `document.hasFocus()`/`:focus-visible` are false/inert otherwise, and the extension's synthetic Tab key is unreliable in that state. Confirmed by checking `document.hasFocus()` before trusting any focus-order result. Worth remembering for any future live a11y pass in this environment.
+
+## Changes Made
+
+- None in this entry — the fix itself is logged under `pages/rbac/LOOP.md` Loop 002 since `RoleCard.tsx` lives in that slice. This entry closes the entities/rbac-tracked verification gap.
+
+## Why
+
+N/A — verification-only entry.
+
+## Tests
+
+Live: focused each of the DOM's tabbable elements in order (skip link → nav → sign-out → forms → checklist → role-card checkboxes) via real Tab keypresses with the window genuinely OS-focused; confirmed order matches source, confirmed visible `:focus-visible` ring renders (including the skip link's reposition-on-focus). Toggled a real permission (revoke → grant) against the live backend and confirmed the fix: focus stayed on the same checkbox throughout, never dropped to `<body>`.
+
+## Build
+
+PASS (no change in this entry)
+
+## Lint
+
+PASS (no change in this entry)
+
+## Remaining TODO
+
+- None. This closes the last open item from this slice's accessibility spot-check.
+
+## Next Loop
+
+- No known follow-up.
